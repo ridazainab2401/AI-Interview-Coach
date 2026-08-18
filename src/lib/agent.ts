@@ -9,7 +9,7 @@ import {
   ScoreSet,
 } from "./session";
 
-const MAX_QUESTIONS_PER_STAGE = 4;
+const MAX_QUESTIONS_PER_STAGE = 2
 const STARTING_DIFFICULTY = 3; // 1 = very easy .. 5 = expert level
 const NO_RESPONSE_TOKEN = "__NO_RESPONSE__";
 
@@ -178,7 +178,7 @@ ${followUpOn ? `This must be a direct, EASIER follow-up on the same topic as the
   return askForJson<{ question: string; topic: string }>(
     system,
     [{ role: "user", content: 'Return JSON: {"question": string, "topic": string}' }],
-    1000
+    2500
   );
 }
 
@@ -262,7 +262,7 @@ Think step by step like a real interviewer (silently), then produce ONLY the JSO
         }`,
       },
     ],
-    1000
+    2500
   );
 }
 
@@ -287,10 +287,12 @@ async function advanceWithoutAnswer(session: InterviewSession, turn: TranscriptI
   // Lower difficulty
   session.difficulty = Math.max(1, session.difficulty - 1);
 
+  let stageAdvanced = false;
   if (session.questionsInStage >= MAX_QUESTIONS_PER_STAGE) {
     session.stageIndex += 1;
     session.questionsInStage = 0;
     session.difficulty = STARTING_DIFFICULTY;
+    stageAdvanced = true;
   }
 
   if (session.stageIndex >= session.domain.stages.length) {
@@ -299,6 +301,8 @@ async function advanceWithoutAnswer(session: InterviewSession, turn: TranscriptI
     return {
       sessionId: session.id,
       spokenText: "No response detected. That wraps up all our questions — thank you for your time. Let's take a look at how you did.",
+      feedback: "No response detected. That wraps up all our questions — thank you for your time. Let's take a look at how you did.",
+      question: "",
       action: "complete",
       done: true,
       lastScore: zeroScores,
@@ -324,12 +328,17 @@ async function advanceWithoutAnswer(session: InterviewSession, turn: TranscriptI
 
   await setSession(session.id, session);
 
-  const spoken = `No response detected within 10 seconds. Let's move on. ${q.question}`;
+  const feedbackText = stageAdvanced
+    ? `No response detected. Now I'll hand it over to ${newStage.persona.split(",")[0]}.`
+    : `No response detected. Let's move on.`;
+
+  const spoken = `${feedbackText} ${q.question}`;
 
   return {
     sessionId: session.id,
     persona: newStage.persona,
     spokenText: spoken,
+    feedback: feedbackText,
     question: q.question,
     stage: newStage.key,
     lastScore: zeroScores,
@@ -342,7 +351,7 @@ async function advanceWithoutAnswer(session: InterviewSession, turn: TranscriptI
 export async function startInterview(domainId: string, candidateName: string, userId?: string): Promise<any> {
   const session = createSession(domainId, candidateName, userId);
   const stage = currentStage(session);
-  
+
   let q;
   try {
     q = await generateQuestion(session);
@@ -459,6 +468,7 @@ export async function submitAnswer(sessionId: string, answerText: string): Promi
     hint = decision.hint;
   }
 
+  let stageAdvanced = false;
   if (session.questionsInStage >= MAX_QUESTIONS_PER_STAGE) {
     action = "advance_stage";
   }
@@ -467,6 +477,7 @@ export async function submitAnswer(sessionId: string, answerText: string): Promi
     session.stageIndex += 1;
     session.questionsInStage = 0;
     session.difficulty = STARTING_DIFFICULTY; // reset difficulty for new interviewer
+    stageAdvanced = true;
   }
 
   if (session.stageIndex >= session.domain.stages.length) {
@@ -475,6 +486,8 @@ export async function submitAnswer(sessionId: string, answerText: string): Promi
     return {
       sessionId,
       spokenText: `${decision.spokenFeedback} That wraps up all our questions — thank you for your time. Let's take a look at how you did.`,
+      feedback: `${decision.spokenFeedback} That wraps up all our questions — thank you for your time. Let's take a look at how you did.`,
+      question: "",
       action: "complete",
       done: true,
       progress: progressOf(session),
@@ -503,21 +516,23 @@ export async function submitAnswer(sessionId: string, answerText: string): Promi
 
   await setSession(sessionId, session);
 
-  let spoken = "";
-  if (action === "advance_stage") {
-    spoken = `${decision.spokenFeedback} Now I'll hand it over to ${newStage.persona.split(",")[0]}. ${q.question}`;
+  let transitionPhrase = "";
+  if (stageAdvanced) {
+    transitionPhrase = ` Now I'll hand it over to ${newStage.persona.split(",")[0]}.`;
   } else if (action === "hint_then_easier") {
-    spoken = `${decision.spokenFeedback} Here's a hint: ${hint} ${q.question}`;
+    transitionPhrase = ` Here's a hint: ${hint}`;
   } else if (action === "next_question_harder") {
-    spoken = `${decision.spokenFeedback} Nice — let's raise the bar a bit. ${q.question}`;
-  } else {
-    spoken = `${decision.spokenFeedback} ${q.question}`;
+    transitionPhrase = ` Nice — let's raise the bar a bit.`;
   }
+  const feedbackText = `${decision.spokenFeedback}${transitionPhrase}`;
+
+  const spoken = `${feedbackText} ${q.question}`;
 
   return {
     sessionId,
     persona: newStage.persona,
     spokenText: spoken,
+    feedback: feedbackText,
     question: q.question,
     stage: newStage.key,
     lastScore: formattedScores,

@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 const NO_RESPONSE_TOKEN = "__NO_RESPONSE__";
-const SILENCE_TIMEOUT_MS = 10000;
+const SILENCE_TIMEOUT_MS = 5000;
 
 interface ScoreSet {
   communication: number;
@@ -50,6 +50,7 @@ export default function VoiceInterviewRoom() {
   const [question, setQuestion] = useState("Connecting you with your panel...");
   const [hint, setHint] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [feedbackText, setFeedbackText] = useState("");
   const [liveTranscript, setLiveTranscript] = useState("");
   const [micStatus, setMicStatus] = useState("Waiting for voice prompt...");
 
@@ -384,6 +385,14 @@ export default function VoiceInterviewRoom() {
     clearSilenceTimer();
     stopRecordingUI();
 
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {
+        console.error("Error stopping recognition on finalize:", e);
+      }
+    }
+
     const answer = hasSpeechStartedRef.current ? accumulatedAnswerRef.current.trim() : NO_RESPONSE_TOKEN;
     submitAnswer(answer || NO_RESPONSE_TOKEN);
   };
@@ -430,18 +439,54 @@ export default function VoiceInterviewRoom() {
       const data = await res.json();
 
       if (data.action === "retry") {
+        setFeedbackText("");
         setFeedback("");
         await speak(data.spokenText);
         setMicStatus("Tap the mic to answer");
         return;
       }
 
-      syncSessionState(data);
-      await speak(data.spokenText);
-
-      if (!data.done) {
-        startRecording();
+      // 1. Immediately update live scores and stage progress
+      if (data.lastScore) {
+        setLiveScores(data.lastScore);
       }
+      setStageIndex(data.progress.stageIndex);
+      setTotalStages(data.progress.totalStages);
+      setDifficulty(data.progress.difficulty);
+
+      if (data.done) {
+        setFeedbackText(data.feedback || "Interview completed.");
+        setMicStatus("Interview complete!");
+        await speak(data.spokenText);
+        setScreen("report");
+        loadReportData();
+        return;
+      }
+
+      // 2. Speak and display the feedback
+      const currentFeedback = data.feedback || "Okay, I see your point. Let's continue.";
+      setFeedbackText(currentFeedback);
+      setMicStatus("AI is giving feedback...");
+      await speak(currentFeedback);
+
+      // 3. Pause for 5 seconds countdown
+      for (let i = 5; i > 0; i--) {
+        setMicStatus(`Next question in ${i}s...`);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+
+      // 4. Update persona, question and hint, then clear feedbackText
+      setFeedbackText("");
+      setPersona(data.persona || "");
+      setQuestion(data.question);
+      setHint(data.hint || "");
+
+      // 5. Speak the next question
+      setMicStatus("AI is asking...");
+      await speak(data.question);
+
+      // 6. Start recording for the user's answer
+      startRecording();
     } catch (err) {
       console.error("Answer submission failed:", err);
       setMicStatus("Error occurred. Tap the mic button to try again.");
@@ -485,8 +530,8 @@ export default function VoiceInterviewRoom() {
                 <span
                   key={lvl}
                   className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${lvl <= difficulty
-                      ? "bg-[var(--amber)]"
-                      : "bg-[var(--panel-2)]"
+                    ? "bg-[var(--amber)]"
+                    : "bg-[var(--panel-2)]"
                     } ${lvl === difficulty ? "scale-125" : ""}`}
                 />
               ))}
@@ -499,10 +544,10 @@ export default function VoiceInterviewRoom() {
               <span
                 key={i}
                 className={`w-6 h-1.5 rounded-full transition duration-300 ${i < stageIndex
-                    ? "bg-[var(--amber)] opacity-40"
-                    : i === stageIndex
-                      ? "bg-[var(--amber)]"
-                      : "bg-[var(--panel-2)]"
+                  ? "bg-[var(--amber)] opacity-40"
+                  : i === stageIndex
+                    ? "bg-[var(--amber)]"
+                    : "bg-[var(--panel-2)]"
                   }`}
               />
             ))}
@@ -515,7 +560,7 @@ export default function VoiceInterviewRoom() {
             — {persona || "Active Panelist"}
           </p>
           <h2 className="font-display text-2xl md:text-3xl font-semibold text-[var(--text)] leading-snug mb-6">
-            {question}
+            {feedbackText ? feedbackText : question}
           </h2>
           {hint && (
             <div className="font-mono text-xs text-[var(--teal)] bg-[var(--teal)]/5 border-l-2 border-[var(--teal)] p-4 rounded-r-xl max-w-2xl">
@@ -550,8 +595,8 @@ export default function VoiceInterviewRoom() {
           <button
             onClick={handleMicToggle}
             className={`w-20 h-20 rounded-full flex items-center justify-center transition duration-300 shadow-xl cursor-pointer ${isRecording
-                ? "bg-[var(--red)] text-white hover:bg-[var(--red)]/90"
-                : "bg-[var(--amber)] text-[#17140f] hover:scale-105"
+              ? "bg-[var(--red)] text-white hover:bg-[var(--red)]/90"
+              : "bg-[var(--amber)] text-[#17140f] hover:scale-105"
               }`}
           >
             {isRecording ? (

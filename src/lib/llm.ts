@@ -44,9 +44,8 @@ export async function askForJson<T = any>(
 ): Promise<T> {
   const jsonSystem =
     system +
-    "\n\nYou MUST wrap your final JSON output in ```json and ``` markdown fences. " +
-    "Before the JSON, you may think step-by-step. " +
-    "But your final answer must be a single valid JSON object inside a ```json block.";
+    "\n\nYou MUST return a single valid JSON object matching the requested schema. " +
+    "Do not wrap the output in markdown fences (like ```json) or add any explanation text outside the JSON object.";
 
   const run = async (): Promise<T> => {
     const response = await client.chat.completions.create({
