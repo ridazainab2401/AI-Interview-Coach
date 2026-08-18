@@ -14,10 +14,27 @@ if (!isValidUrl(supabaseUrl) || !supabaseAnonKey || supabaseAnonKey.includes("pl
 }
 
 const activeUrl = isValidUrl(supabaseUrl) ? supabaseUrl : "https://dummy.supabase.co";
-const activeKey = supabaseAnonKey && !supabaseAnonKey.includes("placeholder") && !supabaseAnonKey.includes("your_") 
-  ? supabaseAnonKey 
+const activeKey = supabaseAnonKey && !supabaseAnonKey.includes("placeholder") && !supabaseAnonKey.includes("your_")
+  ? supabaseAnonKey
   : "dummy_key";
 
 // Client for frontend / client-side components
 export const supabase = createClient(activeUrl, activeKey);
+
+// Synchronize auth state with cookies for Next.js Middleware check
+if (typeof window !== "undefined") {
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+      if (session) {
+        // Cookie expires in 7 days
+        const maxAge = 7 * 24 * 60 * 60;
+        document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax; Secure`;
+      }
+    } else if (event === "SIGNED_OUT") {
+      // Delete cookie
+      document.cookie = "sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure";
+    }
+  });
+}
+
 
