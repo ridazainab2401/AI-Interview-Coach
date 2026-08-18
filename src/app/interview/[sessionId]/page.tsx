@@ -52,12 +52,12 @@ export default function VoiceInterviewRoom() {
   const [feedback, setFeedback] = useState("");
   const [liveTranscript, setLiveTranscript] = useState("");
   const [micStatus, setMicStatus] = useState("Waiting for voice prompt...");
-  
+
   // Progress states
   const [stageIndex, setStageIndex] = useState(0);
   const [totalStages, setTotalStages] = useState(4);
   const [difficulty, setDifficulty] = useState(3);
-  
+
   // Scoreboard live values (1-10 mapped to stars)
   const [liveScores, setLiveScores] = useState<ScoreSet>({
     communication: 0,
@@ -122,7 +122,7 @@ export default function VoiceInterviewRoom() {
           throw new Error("Failed to load interview session");
         }
         const data = await res.json();
-        
+
         // If the session is already finished, show report screen immediately
         // Wait, does the session have a `done` flag in the report?
         // Let's check `buildReport`: it returns candidate, role, scoreboard, etc.
@@ -180,7 +180,7 @@ export default function VoiceInterviewRoom() {
     setDifficulty(data.progress.difficulty);
     setHint(data.hint || "");
     setFeedback(data.spokenText || "");
-    
+
     if (data.lastScore) {
       setLiveScores(data.lastScore);
     }
@@ -218,7 +218,7 @@ export default function VoiceInterviewRoom() {
           }
           throw new Error("Could not find session");
         }
-        
+
         const data = await res.json();
         if (data.done) {
           loadReportData();
@@ -229,15 +229,15 @@ export default function VoiceInterviewRoom() {
           startRecording();
         }
       } catch (err) {
-        console.error(e => e);
+        console.error(err);
         // Fallback: if we just entered the room, we can start with dummy or start interview
         setScreen("interview");
       }
     };
-    
+
     // We will create the GET session route next
     initSession();
-    
+
     return () => {
       // Clean up recognition and synthesis
       if (recognitionRef.current) {
@@ -292,7 +292,7 @@ export default function VoiceInterviewRoom() {
     if (typeof window === "undefined") return null;
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) return null;
-    
+
     const rec = new SpeechRecognition();
     rec.lang = "en-US";
     rec.interimResults = true;
@@ -302,7 +302,7 @@ export default function VoiceInterviewRoom() {
 
   const startRecording = () => {
     if (turnFinalizedRef.current && isRecording) return;
-    
+
     const rec = getRecognition();
     if (!rec) {
       setMicStatus("Speech recognition is not supported in this browser. Please use Chrome.");
@@ -313,7 +313,7 @@ export default function VoiceInterviewRoom() {
     turnFinalizedRef.current = false;
     hasSpeechStartedRef.current = false;
     accumulatedAnswerRef.current = "";
-    
+
     setIsRecording(true);
     setMicStatus("Listening... (Speak now or wait 10s to skip)");
     setLiveTranscript("");
@@ -428,7 +428,7 @@ export default function VoiceInterviewRoom() {
       }
 
       const data = await res.json();
-      
+
       if (data.action === "retry") {
         setFeedback("");
         await speak(data.spokenText);
@@ -438,7 +438,7 @@ export default function VoiceInterviewRoom() {
 
       syncSessionState(data);
       await speak(data.spokenText);
-      
+
       if (!data.done) {
         startRecording();
       }
@@ -484,11 +484,10 @@ export default function VoiceInterviewRoom() {
               {[1, 2, 3, 4, 5].map((lvl) => (
                 <span
                   key={lvl}
-                  className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                    lvl <= difficulty
+                  className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${lvl <= difficulty
                       ? "bg-[var(--amber)]"
                       : "bg-[var(--panel-2)]"
-                  } ${lvl === difficulty ? "scale-125" : ""}`}
+                    } ${lvl === difficulty ? "scale-125" : ""}`}
                 />
               ))}
             </div>
@@ -499,13 +498,12 @@ export default function VoiceInterviewRoom() {
             {Array.from({ length: totalStages }).map((_, i) => (
               <span
                 key={i}
-                className={`w-6 h-1.5 rounded-full transition duration-300 ${
-                  i < stageIndex
+                className={`w-6 h-1.5 rounded-full transition duration-300 ${i < stageIndex
                     ? "bg-[var(--amber)] opacity-40"
                     : i === stageIndex
-                    ? "bg-[var(--amber)]"
-                    : "bg-[var(--panel-2)]"
-                }`}
+                      ? "bg-[var(--amber)]"
+                      : "bg-[var(--panel-2)]"
+                  }`}
               />
             ))}
           </div>
@@ -551,11 +549,10 @@ export default function VoiceInterviewRoom() {
           {/* Large mic button */}
           <button
             onClick={handleMicToggle}
-            className={`w-20 h-20 rounded-full flex items-center justify-center transition duration-300 shadow-xl cursor-pointer ${
-              isRecording
+            className={`w-20 h-20 rounded-full flex items-center justify-center transition duration-300 shadow-xl cursor-pointer ${isRecording
                 ? "bg-[var(--red)] text-white hover:bg-[var(--red)]/90"
                 : "bg-[var(--amber)] text-[#17140f] hover:scale-105"
-            }`}
+              }`}
           >
             {isRecording ? (
               <svg viewBox="0 0 24 24" width="30" height="30" fill="none">
@@ -597,7 +594,7 @@ export default function VoiceInterviewRoom() {
               Live Scores
             </p>
           </div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full text-center">
             {[
               { label: "Communication", key: "communication" as const },

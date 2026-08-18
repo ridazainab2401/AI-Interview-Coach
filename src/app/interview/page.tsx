@@ -146,11 +146,10 @@ export default function InterviewDashboard() {
                   key={d.id}
                   type="button"
                   onClick={() => setSelectedDomain(d.id)}
-                  className={`p-5 rounded-2xl border text-left flex flex-col gap-2 transition duration-200 cursor-pointer ${
-                    selectedDomain === d.id
-                      ? "border-[var(--amber)] bg-[var(--amber-dim)]/5"
-                      : "border-[var(--border)] bg-[var(--panel)] hover:-translate-y-0.5 hover:border-[var(--muted)]"
-                  }`}
+                  className={`p-5 rounded-2xl border text-left flex flex-col gap-2 transition duration-200 cursor-pointer ${selectedDomain === d.id
+                    ? "border-[var(--amber)] bg-[var(--amber-dim)]/5"
+                    : "border-[var(--border)] bg-[var(--panel)] hover:-translate-y-0.5 hover:border-[var(--muted)]"
+                    }`}
                 >
                   <h3 className="font-display font-semibold text-lg text-[var(--amber)]">
                     {d.label}

@@ -1,4 +1,4 @@
-import { Redis } from "@upstash/redis";
+import Redis from "ioredis";
 
 export interface ScoreSet {
   communication: number;
@@ -39,25 +39,23 @@ export interface InterviewSession {
 let redisClient: Redis | null = null;
 const memoryStore = new Map<string, string>();
 
-if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+if (process.env.REDIS_URL) {
   try {
-    redisClient = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN,
-    });
+    redisClient = new Redis(process.env.REDIS_URL);
   } catch (err) {
-    console.error("Failed to initialize Upstash Redis:", err);
+    console.error("Failed to initialize Redis with ioredis:", err);
   }
 } else {
   console.warn(
-    "UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN is missing. Falling back to in-memory store (sessions will not persist across serverless instances)."
+    "REDIS_URL is missing. Falling back to in-memory store (sessions will not persist across serverless instances)."
   );
 }
 
 export async function getSession(id: string): Promise<InterviewSession | null> {
   if (redisClient) {
     try {
-      return await redisClient.get<InterviewSession>(`session:${id}`);
+      const raw = await redisClient.get(`session:${id}`);
+      return raw ? (JSON.parse(raw) as InterviewSession) : null;
     } catch (err) {
       console.error(`Redis error fetching session ${id}:`, err);
     }
@@ -73,7 +71,7 @@ export async function setSession(id: string, session: InterviewSession): Promise
   if (redisClient) {
     try {
       // 2 hours expiry (7200 seconds)
-      await redisClient.set(`session:${id}`, session, { ex: 7200 });
+      await redisClient.set(`session:${id}`, JSON.stringify(session), "EX", 7200);
       return;
     } catch (err) {
       console.error(`Redis error setting session ${id}:`, err);
@@ -97,3 +95,4 @@ export async function deleteSession(id: string): Promise<void> {
   // Fallback to memory
   memoryStore.delete(id);
 }
+
