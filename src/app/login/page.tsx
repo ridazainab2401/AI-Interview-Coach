@@ -55,12 +55,18 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md glass-panel p-8 rounded-2xl border-amber/15 shadow-2xl">
+      <div className="w-full max-w-md glass-panel p-8 rounded-3xl border-biolume-purple/20 shadow-2xl relative overflow-hidden">
+        {/* Glow decorative bubble inside card */}
+        <div className="absolute top-0 right-0 w-24 h-24 bg-primary-container/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+
         <div className="text-center mb-8">
-          <p className="font-mono text-xs uppercase tracking-widest text-[var(--amber)] mb-2">
-            The Interview Room
-          </p>
-          <h1 className="font-display text-3xl font-semibold text-[var(--text)]">
+          <div className="flex justify-center items-center gap-1.5 mb-2">
+            <img src="/assets/waterdrop.png" alt="Waterdrop Logo" className="w-4 h-4 object-contain" />
+            <p className="font-mono text-xs uppercase tracking-widest text-pink-accent font-bold">
+              WhaleWise Coach
+            </p>
+          </div>
+          <h1 className="font-display text-4xl font-extrabold text-ocean-deep">
             Welcome back
           </h1>
           <p className="text-sm text-[var(--muted)] mt-1">
@@ -127,7 +133,7 @@ export default function LoginPage() {
             onClick={handleDemoBypass}
             className="px-4 py-2 border border-[var(--border)] hover:border-[var(--amber)] rounded-full text-xs font-mono text-[var(--text)] transition cursor-pointer"
           >
-            Skip & Run Local Demo
+            Continue as Guest
           </button>
         </div>
       </div>

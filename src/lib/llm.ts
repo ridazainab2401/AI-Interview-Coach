@@ -40,7 +40,7 @@ function extractJson(text: string): string {
 export async function askForJson<T = any>(
   system: string,
   userMessages: { role: "user" | "assistant" | "system"; content: string }[],
-  maxTokens: number = 700
+  maxTokens: number = 4000
 ): Promise<T> {
   const jsonSystem =
     system +
