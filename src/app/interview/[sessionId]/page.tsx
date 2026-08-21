@@ -512,7 +512,9 @@ export default function VoiceInterviewRoom() {
               className="p-2.5 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant flex items-center justify-center border-2 border-biolume-purple/35 cursor-pointer bg-white/40"
               title="Quit Interview"
             >
-              <span className="material-symbols-outlined text-xl">close</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
         </header>
@@ -524,7 +526,9 @@ export default function VoiceInterviewRoom() {
             {/* Dialogue Balloon Question Card */}
             <div className="w-full max-w-3xl speech-balloon rounded-[32px] p-8 md:p-10 mb-10 text-center relative z-10 transition-all hover:scale-[1.01] duration-300">
               <div className="inline-flex items-center gap-2 bg-sparkle-glow text-primary px-4 py-1.5 rounded-full mb-5 shadow-sm border border-white font-bold text-xs">
-                <span className="material-symbols-outlined text-sm">psychology</span>
+                <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122A3 3 0 0010.5 21.5h3a3 3 0 00.97-5.378m-4.94-1.122a3 3 0 114.94 0M12 14v3m-3-1.5h6" />
+                </svg>
                 <span className="font-label-sm text-label-sm uppercase tracking-wider">
                   Stage: {persona.split(",")[0] || "Panelist"}
                 </span>
@@ -537,7 +541,9 @@ export default function VoiceInterviewRoom() {
               {hint && (
                 <div className="text-left bg-surface-container/50 rounded-2xl p-5 border border-biolume-purple/30 mt-6 relative overflow-hidden">
                   <div className="flex items-center gap-2 text-secondary font-black text-xs uppercase tracking-wider mb-2">
-                    <span className="material-symbols-outlined text-sm">lightbulb</span>
+                    <svg className="w-4 h-4 text-secondary" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-3m0 3v3m0-6h.008M12 3a9 9 0 00-9 9c0 2.222.805 4.257 2.13 5.842a2.25 2.25 0 01.597 1.517l.03 1.054a1.5 1.5 0 001.5 1.458h5.544a1.5 1.5 0 001.5-1.458l.03-1.054a2.25 2.25 0 01.596-1.517A9 9 0 0012 3z" />
+                    </svg>
                     <span>Hint</span>
                   </div>
                   <p className="font-body-md text-body-md text-on-surface leading-relaxed font-bold">
@@ -592,9 +598,15 @@ export default function VoiceInterviewRoom() {
                   }`}
                 title={isRecording ? "Stop speaking and submit" : "Start speaking"}
               >
-                <span className="material-symbols-outlined text-4xl" style={{ fontVariationSettings: isRecording ? "'FILL' 1" : "'FILL' 0" }}>
-                  {isRecording ? "stop" : "mic"}
-                </span>
+                {isRecording ? (
+                  <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <rect x="4" y="4" width="16" height="16" rx="2" />
+                  </svg>
+                ) : (
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                  </svg>
+                )}
               </button>
 
               <p className="text-sm font-mono text-[var(--muted)] font-black text-center">
@@ -608,7 +620,9 @@ export default function VoiceInterviewRoom() {
             <div className="glass-panel rounded-[32px] p-8 flex flex-col gap-6 h-full border-2 border-biolume-purple/20 bg-white/70">
               <div className="flex items-center justify-between border-b border-biolume-purple/20 pb-4">
                 <h3 className="font-display text-2xl font-black text-ocean-deep flex items-center gap-2">
-                  <span className="material-symbols-outlined text-secondary">analytics</span>
+                  <svg className="w-6 h-6 text-secondary" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v5.25c0 .621-.504 1.125-1.125 1.125h-2.25A1.125 1.125 0 013 18.375v-5.25zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125v-9.75zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v14.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                  </svg>
                   Live Signals
                 </h3>
                 {/* Level / Difficulty Indicator */}
@@ -650,7 +664,7 @@ export default function VoiceInterviewRoom() {
                     <div className="flex justify-between items-end">
                       <span className="font-black text-sm text-on-surface">{label}</span>
                       <span className="font-mono text-sm text-secondary font-black">
-                        {liveScores[key] > 0 ? `${liveScores[key]} / 10` : "Analyzing..."}
+                        {liveScores[key] > 0 ? `${liveScores[key]} / 10` : micStatus === "Thinking..." ? "Analyzing..." : "Pending"}
                       </span>
                     </div>
                     <div className="w-full bg-surface-container rounded-full h-3 overflow-hidden border border-white relative inner-glow">
@@ -676,7 +690,10 @@ export default function VoiceInterviewRoom() {
                   onClick={() => router.push("/interview")}
                   className="flex-1 bg-surface-container-high/60 hover:bg-surface-container-high text-primary py-3.5 rounded-2xl font-bold transition-all shadow-sm flex justify-center items-center gap-1.5 border border-biolume-purple/20 text-xs cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-sm">logout</span> Quit
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12-12" />
+                  </svg>
+                  Quit
                 </button>
                 <button
                   onClick={handleMicToggle}
@@ -749,7 +766,9 @@ export default function VoiceInterviewRoom() {
           {/* Detailed Score Breakdown */}
           <div className="lg:col-span-8 glass-card rounded-[32px] p-8 relative overflow-hidden border-2 border-biolume-purple/20 bg-white/70">
             <h3 className="font-display text-xl font-black text-ocean-deep uppercase tracking-wider mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined text-secondary">bar_chart</span>
+              <svg className="w-5 h-5 text-secondary" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
+              </svg>
               Detailed Score Breakdown
             </h3>
             <div className="space-y-6">
@@ -780,7 +799,9 @@ export default function VoiceInterviewRoom() {
             {/* Strong Areas */}
             <div className="glass-card rounded-[32px] p-6 flex-1 border-2 border-biolume-purple/20 bg-white/70">
               <h3 className="font-display text-xs font-black text-primary uppercase tracking-wider mb-4 flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M11.48 3.499c.196-.612 1.056-.612 1.252 0l1.834 5.727a.75.75 0 00.713.518h6.021c.643 0 .908.824.387 1.203l-4.871 3.538a.75.75 0 00-.272.838l1.834 5.727c.196.612-.502 1.119-1.023.758l-4.871-3.538a.75.75 0 00-.877 0l-4.871 3.538c-.52.361-1.219-.146-1.023-.758l1.834-5.727a.75.75 0 00-.272-.838l-4.871-3.538c-.52-.379-.255-1.203.387-1.203h6.021a.75.75 0 00.713-.518l1.834-5.727z" />
+                </svg>
                 Strong Areas
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -802,7 +823,9 @@ export default function VoiceInterviewRoom() {
             {/* Needs Improvement */}
             <div className="glass-card rounded-[32px] p-6 flex-1 border-2 border-biolume-purple/20 bg-white/70">
               <h3 className="font-display text-xs font-black text-red-600 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-red-600 text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>trending_up</span>
+                <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+                </svg>
                 Needs Improvement
               </h3>
               <div className="flex flex-col gap-2">
@@ -826,10 +849,14 @@ export default function VoiceInterviewRoom() {
           {/* Feedback & Recommendation */}
           <div className="lg:col-span-12 glass-card rounded-[32px] p-8 border-l-4 border-l-pink-accent border-2 border-biolume-purple/20 relative bg-white/70">
             <div className="absolute top-4 right-4 text-pink-accent/15">
-              <span className="material-symbols-outlined text-6xl" style={{ fontVariationSettings: "'FILL' 1" }}>format_quote</span>
+              <svg className="w-12 h-12 text-pink-accent/15" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.85h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.85h3.999v10h-9.999z" />
+              </svg>
             </div>
             <h3 className="font-display text-xs font-black text-pink-accent uppercase tracking-wider mb-4 flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-pink-accent text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>lightbulb</span>
+              <svg className="w-4 h-4 text-pink-accent" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-3m0 3v3m0-6h.008M12 3a9 9 0 00-9 9c0 2.222.805 4.257 2.13 5.842a2.25 2.25 0 01.597 1.517l.03 1.054a1.5 1.5 0 001.5 1.458h5.544a1.5 1.5 0 001.5-1.458l.03-1.054a2.25 2.25 0 01.596-1.517A9 9 0 0012 3z" />
+              </svg>
               Architect's Feedback &amp; Recommendation
             </h3>
             <p className="font-body-lg text-lg text-on-surface relative z-10 leading-relaxed font-black">
@@ -882,7 +909,9 @@ export default function VoiceInterviewRoom() {
             className="px-12 py-4.5 rounded-full bg-gradient-to-r from-primary to-pink-accent text-white font-headline-md text-lg font-black shadow-lg shadow-pink-accent/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center gap-3 sparkle-bg inner-glow border-2 border-white/40 cursor-pointer"
           >
             <span>Start New Practice</span>
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>rocket_launch</span>
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.63 8.41a14.98 14.98 0 00-6.16 12.12A14.98 14.98 0 0015.59 14.37zm0 0L12 18m3.59-3.63h-4.8M9.63 8.41L12 6" />
+            </svg>
           </button>
         </div>
       </main>

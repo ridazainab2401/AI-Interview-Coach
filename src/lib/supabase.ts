@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -19,7 +19,7 @@ const activeKey = supabaseAnonKey && !supabaseAnonKey.includes("placeholder") &&
   : "dummy_key";
 
 // Client for frontend / client-side components
-export const supabase = createClient(activeUrl, activeKey);
+export const supabase = createBrowserClient(activeUrl, activeKey);
 
 // Synchronize auth state with cookies for Next.js Middleware check
 if (typeof window !== "undefined") {
